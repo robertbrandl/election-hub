@@ -1,0 +1,94 @@
+.title {
+  background-color: #333;
+  padding: 0.5px;
+}
+
+.navbar ul {
+  list-style-type: none;
+  background-color: #333;
+  padding-bottom: 10px;
+
+  display: flex;
+  justify-content: right;
+}
+
+.navbar li {
+  display: inline;
+  background-color: #333;
+}
+
+.navbar a {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 10px;
+  position: relative;
+}
+
+.navbar a:hover {
+  color: #a6a6a6;
+  text-decoration: underline;
+  padding: 5px 10px;
+  position: relative;
+}
+.mainbar {
+  background-color: #ffffff;
+  padding: 5px;
+  border-bottom: 1px solid #333;
+}
+
+.mainbar ul {
+  list-style-type: none;
+  background-color: #ffffff;
+  padding-top: 30px;
+  padding-bottom: 30px;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+.mainbar li {
+  display: inline;
+  background-color: #638bef;
+  font-size: large;
+}
+
+.mainbar a {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 10px;
+  position: relative;
+}
+
+.mainbar a:hover {
+  color: #a6a6a6;
+  text-decoration: underline;
+  padding: 5px 10px;
+  position: relative;
+}
+.title .playlist-hub {
+  font-size: 32px;
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(135deg, #b58ded, #1b8af1);
+  font-weight: bold;
+  letter-spacing: 1.5px;
+}
+.title .playlist-hub:hover {
+  color: #2e86ab;
+}
+.navbar .btn {
+  width: 105px;
+  height: 30px;
+  border-radius: 30px;
+  background: #b58ded;
+  border: none;
+  font-family: "Montserrat";
+  font-size: 18px;
+  color: #ffffff;
+  cursor: pointer;
+}
+.navbar .btn:hover{
+  color: #863dec;
+}
