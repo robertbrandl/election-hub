@@ -1,0 +1,86 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+.link-list {
+  padding: 20px;
+}
+
+.link-list h1 {
+  margin-bottom: 20px;
+}
+.linker {
+  border: 1px solid white;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 10px;
+}
+
+.linker {
+  display: block;
+  text-decoration: none;
+  color: rgb(255, 255, 255);
+  background-color: rgba(161, 161, 161, 0.33);
+  padding: 10px;
+  text-align: left;
+  border: 1px solid white;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+}
+
+.linker:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.genre {
+  float: right;
+  color: rgb(0, 0, 0);
+  margin-right: 10px;
+}
+
+.created-by {
+  margin-left: 20px;
+}
+
+.link-list a:hover {
+  color: #f0f0f0;
+}
+
+.list-buttons {
+  margin-left: 650px;
+}
+.prev-button,
+.next-button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.prev-button:hover,
+.next-button:hover {
+  background-color: #0056b3;
+}
+
+.item-holder {
+  margin: 15px;
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+hr {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
