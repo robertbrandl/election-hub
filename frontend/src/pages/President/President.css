@@ -1,0 +1,29 @@
+.poll-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .poll-table th, .poll-table td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: left;
+  }
+  
+  .poll-table th {
+    background-color: #f4f4f4;
+  }
+  
+  .poll-table a {
+    color: #1a73e8;
+    text-decoration: none;
+  }
+  
+  .poll-table a:hover {
+    text-decoration: underline;
+  }
+  
+  .error-gen {
+    color: red;
+    font-weight: bold;
+  }
+  
