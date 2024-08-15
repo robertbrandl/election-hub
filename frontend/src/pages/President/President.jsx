@@ -12,9 +12,13 @@ export const President = () => {
           try {
             let response = null;
             response = await axios.get(
-              `http://localhost:3000/president/polls`,
-              {}
-            );
+                'http://localhost:3000/president/polls',
+                {
+                  params: {
+                    cycleYear: 2024, 
+                  }
+                }
+              );
             console.log(response)
             console.log(response.data.polls);
             setPollData(response.data.polls);

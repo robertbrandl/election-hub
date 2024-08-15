@@ -1,27 +1,33 @@
 import axios from 'axios';
 import Papa from 'papaparse';
-const getPollingData = async () => {
+
+const getPollingData = async (cycleYear) => {
+  try {
     // Fetch the CSV data
-    fetch('https://projects.fivethirtyeight.com/polls-page/president_polls.csv')
-    .then(response => response.text())
-    .then(csvData => {
+    const response = await fetch('https://projects.fivethirtyeight.com/polls-page/data/president_polls.csv');
+    const csvData = await response.text();
+
     // Parse the CSV data
-    Papa.parse(csvData, {
+    return new Promise((resolve, reject) => {
+      Papa.parse(csvData, {
         header: true, // Treat the first row as headers
         dynamicTyping: true, // Automatically converts numeric values
-        complete: function(results) {
-        console.log(results.data); // The parsed data
-        // Example: Filtering polls for a specific candidate
-        //const bidenPolls = results.data.filter(poll => poll.candidate_name === 'Joseph R. Biden Jr.');
-        //console.log('Biden Polls:', bidenPolls);
+        complete: function (results) {
+            console.log(results.data)
+            const filteredData = results.data.filter(poll => poll.cycle === cycleYear);
+            resolve(filteredData); // Return the filtered data
         },
-        error: function(error) {
-        console.error('Parsing Error:', error);
+        error: function (error) {
+          reject(error); // Handle parsing error
         }
+      });
     });
-    })
-    .catch(error => console.error('Fetch Error:', error));
-}
+  } catch (error) {
+    console.error('Fetch Error:', error);
+    throw error; // Re-throw the error for higher-level handling
+  }
+};
+
 export default {
-    getPollingData
+  getPollingData
 };
