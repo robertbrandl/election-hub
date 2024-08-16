@@ -19,19 +19,7 @@
     background: #007bff;
     color: white;
   }
-  
-  .poll-table table {
-    width: 100%;
-    border-collapse: collapse;
+  select {
+    padding: 10px;
+    margin-bottom: 20px;
   }
-  
-  .poll-table th, .poll-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  .poll-table th {
-    background-color: #f4f4f4;
-  }
-  

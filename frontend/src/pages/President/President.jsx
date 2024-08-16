@@ -8,6 +8,7 @@ export const President = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState('national');
+    const [selectedState, setSelectedState] = useState('');
     const [stateColors, setStateColors] = useState({
         'California': '#FF6347', // Example state color
         'Texas': '#4682B4',
@@ -47,12 +48,20 @@ export const President = () => {
 
     const getFilteredPolls = () => {
         if (!pollData) return [];
+    
         if (activeTab === 'national') {
           return pollData.filter(poll => poll.state === null).slice(0, 10);
         } else if (activeTab === 'state') {
-          return pollData.filter(poll => poll.state !== null).slice(0, 10);
+          if (selectedState) {
+            return pollData.filter(poll => poll.state === selectedState).slice(0, 10);
+          }
         }
         return [];
+      };
+    const getUniqueStates = () => {
+        if (!pollData) return [];
+        const states = pollData.map(poll => poll.state).filter(state => state).sort();
+        return Array.from(new Set(states)); // Remove duplicates
       };
 
   return (
@@ -67,7 +76,23 @@ export const President = () => {
         </button>
       </div>
       {pollData && pollData.length > 0 ? (
-        <PollTable data={getFilteredPolls()}/>
+        <><>{activeTab === 'national' && <PollTable data={getFilteredPolls()} />}</>
+        <>{activeTab === 'state' && (
+            <div>
+              <select
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+              >
+                <option value="">Select a state</option>
+                {getUniqueStates().map(state => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
+              </select>
+              <PollTable data={getFilteredPolls()} />
+            </div>
+          )}</></>
       ) : (
         <div>No polls available for the 2024 cycle.</div>
       )}
