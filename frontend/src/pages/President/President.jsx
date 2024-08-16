@@ -4,6 +4,51 @@ import { useState, useEffect} from "react";
 import Map from "../../components/Map/Map";
 import PollTable from "../../components/PollTable/PollTable";
 export const President = () => {
+    const mergePolls = (polls) => {
+        const mergedPolls = [];
+      
+        polls.forEach((poll) => {
+          // Check if there's already a poll object with the same poll_id and question_id in the mergedPolls array
+          const existingPoll = mergedPolls.find(
+            (merged) => merged.poll_id === poll.poll_id && merged.question_id === poll.question_id
+          );
+      
+          if (existingPoll) {
+            // If found, add the candidate and their percentage to the existing object
+            existingPoll.candidates.push({
+              name: poll.candidate_name || 'N/A',
+              pct: poll.pct !== undefined ? poll.pct : 'N/A',
+              party: poll.party || 'N/A',
+            });
+          } else {
+            // If not found, create a new entry in the mergedPolls array
+            mergedPolls.push({
+              poll_id: poll.poll_id,
+              question_id: poll.question_id,
+              pollster: poll.pollster,
+              state: poll.state,
+              methodology: poll.methodology || 'N/A',
+              sample_size: poll.sample_size || 'N/A',
+              start_date: poll.start_date,
+              url: poll.url || 'N/A',
+              end_date: poll.end_date,
+              population: poll.population_full,
+              sponsors: poll.sponsors,
+              sponsor_candidate: poll.sponsor_candidate,
+              sponsor_candidate_party: poll.sponsor_candidate_party,
+              candidates: [
+                {
+                  name: poll.candidate_name || 'N/A',
+                  pct: poll.pct !== undefined ? poll.pct : 'N/A',
+                  party: poll.party || 'N/A',
+                }
+              ]
+            });
+          }
+        });
+      
+        return mergedPolls;
+      };
     const [pollData, setPollData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -29,9 +74,9 @@ export const President = () => {
                   }
                 }
               );
-            console.log(response)
             console.log(response.data.polls);
-            setPollData(response.data.polls);
+            console.log(mergePolls(response.data.polls));
+            setPollData(mergePolls(response.data.polls));
           } catch (e) {
             console.log(e)
             setError(e.response || e.message);
@@ -62,7 +107,8 @@ export const President = () => {
         if (!pollData) return [];
         const states = pollData.map(poll => poll.state).filter(state => state).sort();
         return Array.from(new Set(states)); // Remove duplicates
-      };
+    };
+      
 
   return (
     <div>
@@ -90,7 +136,7 @@ export const President = () => {
                   </option>
                 ))}
               </select>
-              <PollTable data={getFilteredPolls()} />
+              {selectedState && <PollTable data={getFilteredPolls()} />}
             </div>
           )}</></>
       ) : (
