@@ -34,6 +34,7 @@ export const President = () => {
           sponsors: poll.sponsors,
           sponsor_candidate: poll.sponsor_candidate,
           sponsor_candidate_party: poll.sponsor_candidate_party,
+          numeric_grade: poll.numeric_grade,
           candidates: [
             {
               name: poll.candidate_name || 'N/A',
@@ -76,7 +77,20 @@ export const President = () => {
           }
         );
 
-        const mergedPolls = mergePolls(response.data.polls);
+        let mergedPolls = mergePolls(response.data.polls);
+        console.log(response.data.polls)
+        mergedPolls = mergedPolls.map(poll => {
+            if (poll.population === "lv") {
+              return { ...poll, population: "Likely Voters" };
+            }
+            else if (poll.population === "rv") {
+                return { ...poll, population: "Registered Voters" };
+            }
+            else if (poll.population === "a") {
+                return { ...poll, population: "Adults" };
+            }
+            return poll;
+          });
         setPollData(mergedPolls);
         updateFilteredPolls(mergedPolls);
       } catch (e) {
@@ -163,12 +177,7 @@ export const President = () => {
         </label>
         <span>{isHeadToHead ? "Head-to-Head Polls" : "Full Field Polls"}</span>
       </div>
-      {filteredPolls && filteredPolls.length > 0 ? (
-        <>
-          {activeTab === "national" && <PollTable data={filteredPolls} />}
-          {activeTab === "state" && (
-            <div>
-              <select
+      {activeTab === "state" && <select
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
               >
@@ -178,7 +187,12 @@ export const President = () => {
                     {state}
                   </option>
                 ))}
-              </select>
+              </select>}
+      {filteredPolls && filteredPolls.length > 0 ? (
+        <>
+          {activeTab === "national" && <PollTable data={filteredPolls} />}
+          {activeTab === "state" && (
+            <div>
               {selectedState && <PollTable data={filteredPolls} />}
             </div>
           )}

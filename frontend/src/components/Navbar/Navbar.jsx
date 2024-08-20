@@ -14,7 +14,7 @@ const Navigation = () => {
     <nav className="title">
     <ul>
       <li>
-        <Link to="/" className="playlist-hub">Politics Hub</Link>
+        <Link to="/" className="playlist-hub">Election Hub</Link>
       </li>
     </ul></nav>
     <nav className="mainbar">

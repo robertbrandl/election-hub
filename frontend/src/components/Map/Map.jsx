@@ -1,4 +1,3 @@
-// src/MapComponent.js
 import React from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 

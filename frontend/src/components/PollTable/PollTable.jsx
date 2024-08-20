@@ -21,6 +21,7 @@ const PollTable = ({ data }) => {
             <th>Sponsors</th>
             <th>Sponsor Candidate</th>
             <th>Sponsor Candidate Party</th>
+            <th>Pollster Rating (Out of 3)</th>
           </tr>
         </thead>
         <tbody>
@@ -45,6 +46,7 @@ const PollTable = ({ data }) => {
                     <td>{renderField(poll.sponsors ? poll.sponsors : 'N/A')}</td>
                     <td>{renderField(poll.sponsor_candidate)}</td>
                     <td>{renderField(poll.sponsor_candidate_party)}</td>
+                    <td>{renderField(poll.numeric_grade)}</td>
                   </>
                 ) : (
                   <>
@@ -53,6 +55,7 @@ const PollTable = ({ data }) => {
                     <td>{renderField(candidate.party)}</td>
                     <td></td>
                     <td>{renderField(candidate.pct)}</td>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
