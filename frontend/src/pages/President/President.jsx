@@ -55,6 +55,7 @@ export const President = () => {
   const [activeTab, setActiveTab] = useState("national");
   const [selectedState, setSelectedState] = useState("");
   const [isHeadToHead, setIsHeadToHead] = useState(true);
+  const [isHighQuality, setIsHighQuality] = useState(true);
   const [filteredPolls, setFilteredPolls] = useState([]);
   const [stateColors, setStateColors] = useState({
     California: "#FF6347",
@@ -115,6 +116,12 @@ export const President = () => {
       );
     }
 
+    if (isHighQuality){
+        filtered = filtered.filter(
+            (poll) => poll.numeric_grade > 2
+          );
+    }
+
     if (activeTab === "national") {
       filtered = filtered.filter((poll) => poll.state === null).slice(0, 10);
     } else if (activeTab === "state") {
@@ -132,7 +139,7 @@ export const President = () => {
     if (pollData) {
       updateFilteredPolls(pollData);
     }
-  }, [isHeadToHead, activeTab, selectedState]);
+  }, [isHeadToHead, isHighQuality, activeTab, selectedState]);
 
   const getUniqueStates = () => {
     if (!pollData) return [];
@@ -176,6 +183,17 @@ export const President = () => {
           <span className="slider round"></span>
         </label>
         <span>{isHeadToHead ? "Head-to-Head Polls" : "Full Field Polls"}</span>
+      </div>
+      <div className="toggle-container">
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={isHighQuality}
+            onChange={() => setIsHighQuality(!isHighQuality)}
+          />
+          <span className="slider round"></span>
+        </label>
+        <span>{isHighQuality ? "High Quality" : "All"}</span>
       </div>
       {activeTab === "state" && <select
                 value={selectedState}
