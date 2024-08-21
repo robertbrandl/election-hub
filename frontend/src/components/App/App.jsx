@@ -6,6 +6,7 @@ import { UpcomingElections } from '../../pages/UpcomingElections/UpcomingElectio
 import { President } from '../../pages/President/President';
 import { NotFound } from '../../pages/NotFound/NotFound';
 import { Home } from '../../pages/Home/Home';
+import {Senate} from "../../pages/Senate/Senate";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route exact path="/upcomingelections" element={<UpcomingElections />} />
         <Route exact path="/president" element={<President />} />
+        <Route exact path="/senate" element={<Senate />} />
         <Route path="*" element={<NotFound />} />
 
       </Routes>

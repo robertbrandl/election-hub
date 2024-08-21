@@ -1,0 +1,105 @@
+/* Main Popup Container */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Darker background for contrast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-in-out;
+    z-index: 1000;
+  }
+  
+  /* Popup Content Styling */
+  .popup-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    animation: slideIn 0.3s ease-in-out;
+    position: relative;
+  }
+  
+  /* Close Button */
+  .popup-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .popup-close:hover {
+    color: #ff6347; /* Slight color change on hover */
+  }
+  
+  /* Title Styling */
+  .popup-content h2 {
+    margin-top: 0;
+    color: #333;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    font-size: 24px;
+  }
+  
+  /* List of Candidates */
+  .popup-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0 0;
+  }
+  
+  .popup-candidate {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .popup-candidate:hover {
+    background-color: #f9f9f9;
+  }
+  
+  /* Candidate Name */
+  .candidate-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 18px;
+  }
+  
+  /* Candidate Party */
+  .candidate-party {
+    font-size: 16px;
+    color: #666;
+    margin-left: 10px;
+  }
+  
+  /* Candidate Average Percentage */
+  .candidate-average {
+    font-size: 16px;
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  /* Fade In Animation */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  /* Slide In Animation */
+  @keyframes slideIn {
+    from { transform: translateY(-20px); }
+    to { transform: translateY(0); }
+  }
+  

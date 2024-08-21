@@ -1,9 +1,10 @@
+import axios from 'axios';
 import Papa from 'papaparse';
 
 const getPollingData = async (cycleYear) => {
   try {
     // Fetch the CSV data
-    const response = await fetch('https://projects.fivethirtyeight.com/polls-page/data/president_polls.csv');
+    const response = await fetch('https://projects.fivethirtyeight.com/polls-page/data/senate_polls.csv');
     const csvData = await response.text();
 
     // Parse the CSV data

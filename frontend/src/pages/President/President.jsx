@@ -59,8 +59,6 @@ export const President = () => {
   const [filteredPolls, setFilteredPolls] = useState([]);
   const [stateColors, setStateColors] = useState({
     California: "#FF6347",
-    Texas: "#4682B4",
-    Florida: "#32CD32",
     // Add more states and colors here
   });
 
