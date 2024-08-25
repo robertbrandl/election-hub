@@ -1,7 +1,7 @@
 import React from 'react';
 import "./PollTable.css";
 
-const PollTable = ({ data }) => {
+const PollTable = ({ data}) => {
   const renderField = (field) => field ? field : 'N/A'; // Helper function to handle empty fields
 
   return (
