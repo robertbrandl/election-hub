@@ -35,6 +35,7 @@ export const President = () => {
           sponsor_candidate: poll.sponsor_candidate,
           sponsor_candidate_party: poll.sponsor_candidate_party,
           numeric_grade: poll.numeric_grade,
+          stage: poll.stage,
           candidates: [
             {
               name: poll.candidate_name || 'N/A',
@@ -48,6 +49,78 @@ export const President = () => {
 
     return mergedPolls;
   };
+  const calculatePollAverages = (polls) => {
+    const stateAverages = {};
+  
+    polls.forEach((poll) => {
+      const hasDemAndRep = poll.candidates.some(candidate => candidate.party === 'DEM' && candidate.name === "Kamala Harris") && 
+                       poll.candidates.some(candidate => candidate.party === 'REP' && candidate.name === 'Donald Trump');
+      if (poll.state && poll.stage && poll.stage === "general" && hasDemAndRep){
+      const state = poll.state;
+  
+      if (!stateAverages[state]) {
+        stateAverages[state] = {};
+      }
+  
+      poll.candidates.forEach((candidate) => {
+        const { name, pct, party } = candidate;
+  
+        if (!stateAverages[state][name]) {
+          stateAverages[state][name] = {
+            total: 0,
+            count: 0,
+            party: party, // Include the party here
+          };
+        }
+  
+        stateAverages[state][name].total += pct;
+        stateAverages[state][name].count += 1;
+      });
+    }});
+  
+    // Calculate the average for each candidate in each state
+    Object.keys(stateAverages).forEach((state) => {
+      Object.keys(stateAverages[state]).forEach((candidate) => {
+        stateAverages[state][candidate].average =
+          stateAverages[state][candidate].total /
+          stateAverages[state][candidate].count;
+      });
+    });
+  
+    return stateAverages;
+  };
+
+  const determineLeadingCandidate = (stateAverages) => {
+    const stateColors = {};
+    console.log(stateAverages)
+
+    Object.keys(stateAverages).forEach((state) => {
+      let leadingCandidate = null;
+      let leadingParty = null;
+      let highestAverage = 0;
+
+      Object.keys(stateAverages[state]).forEach((candidate) => {
+        const avg = stateAverages[state][candidate].average;
+        if (avg > highestAverage) {
+          highestAverage = avg;
+          leadingCandidate = candidate;
+          leadingParty = stateAverages[state][leadingCandidate].party;
+        }
+      });
+      console.log(leadingCandidate)
+
+      // Assign color based on the leading candidate (simplified example)
+      if (leadingParty === "REP") {
+        stateColors[state] = "#FF6347"; // Red
+      } else if (leadingParty === "DEM") {
+        stateColors[state] = "#4682B4"; // Blue
+      } else {
+        stateColors[state] = "#32CD32"; // Green or other
+      }
+    });
+
+    return stateColors;
+  };
 
   const [pollData, setPollData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,9 +130,8 @@ export const President = () => {
   const [isHeadToHead, setIsHeadToHead] = useState(true);
   const [isHighQuality, setIsHighQuality] = useState(true);
   const [filteredPolls, setFilteredPolls] = useState([]);
-  const [stateColors, setStateColors] = useState({
-    // Add more states and colors here
-  });
+  const [stateColors, setStateColors] = useState({});
+  const [stateAverage, setStateAverage] = useState(null);
 
   useEffect(() => {
     setError("");
@@ -89,6 +161,11 @@ export const President = () => {
             }
             return poll;
           });
+          console.log(mergedPolls)
+        const stateAverages = calculatePollAverages(mergedPolls);
+        setStateAverage(stateAverages)
+        const updatedStateColors = determineLeadingCandidate(stateAverages);
+        setStateColors(updatedStateColors);
         setPollData(mergedPolls);
         updateFilteredPolls(mergedPolls);
       } catch (e) {
@@ -155,7 +232,7 @@ export const President = () => {
 
   return (
     <div>
-      <Map stateColors={stateColors} />
+      <Map stateColors={stateColors} stateAverages={stateAverage} />
       <div className="tab-bar">
         <button
           onClick={() => setActiveTab("national")}

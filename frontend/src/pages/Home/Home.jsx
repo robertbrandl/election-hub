@@ -1,38 +1,41 @@
 import React from 'react';
 import './Home.css';
+
 export const Home = () => {
   return (
     <div className="home-container">
-      <h1>Welcome to PlaylistHub!</h1>
-      <p>
-        Discover, create, and share music playlists with friends. Whether
-        you're searching for curated playlists or eager to share your latest
-        compilation, PlaylistHub has got you covered.
-      </p>
-      <h2>Project Description</h2>
-      <p>
-        Finding and sharing music playlists can be cumbersome with the myriad
-        of streaming platforms available. PlaylistHub simplifies this process
-        by providing a central hub where users can create, share, and explore
-        playlists effortlessly.
-      </p>
-      <h3>Features</h3>
-      <ul>
-        <li>Song Search</li>
-        <li>Individual Song Page</li>
-        <li>Sharing Playlist</li>
-        <li>Followed User Playlists</li>
-        <li>Individual Playlist Page</li>
-        <li>User's Statistics Page</li>
-        <li>User Account Management</li>
-      </ul>
-      <h2>Get Started</h2>
-      <p>
-        Ready to dive in? Start exploring PlaylistHub by navigating through our
-        various pages using the navigation bar. Sign up to unlock additional 
-        features such as saving playlists and accessing personalized statistics.
-      </p>
+      <header className="home-header">
+        <h1>Welcome to ElectionHub!</h1>
+        <p>Your one-stop platform for the latest polling data, election insights, and more.</p>
+      </header>
+      
+      <div className="home-content">
+        <div className="card-section">
+          <div className="info-card">
+            <h2>2024 Presidential Election</h2>
+            <p>Stay updated with the latest polls, news, and trends.</p>
+            <button>View Presidential Polls</button>
+          </div>
+          <div className="info-card">
+            <h2>Senate Races</h2>
+            <p>Get insights into key Senate races across the country.</p>
+            <button>View Senate Polls</button>
+          </div>
+          <div className="info-card">
+            <h2>House of Representatives</h2>
+            <p>Explore detailed polling data for House races by district.</p>
+            <button>View House Polls</button>
+          </div>
+        </div>
+
+        <div className="call-to-action">
+          <h2>Make Your Voice Heard</h2>
+          <p>Register to vote and ensure your participation in the upcoming elections.</p>
+          <a href="https://vote.gov/" target="_blank" rel="noopener noreferrer">
+            <button className="cta-button">Register to Vote</button>
+          </a>
+        </div>
+      </div>
     </div>
   );
 };
-
