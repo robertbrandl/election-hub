@@ -3,8 +3,10 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Map from "../../components/Map/Map";
 import PollTable from "../../components/PollTable/PollTable";
+import EVBar from "../../components/EVBar/EVBar";
 
 export const President = () => {
+  let high_quality_score = 2;//change as needed
   const mergePolls = (polls) => {
     const mergedPolls = [];
 
@@ -192,7 +194,7 @@ export const President = () => {
 
     if (isHighQuality){
         filtered = filtered.filter(
-            (poll) => poll.numeric_grade > 2
+            (poll) => poll.numeric_grade > high_quality_score
           );
     }
 
@@ -232,6 +234,7 @@ export const President = () => {
 
   return (
     <div>
+      <EVBar stateAverages={stateAverage} />
       <Map stateColors={stateColors} stateAverages={stateAverage} />
       <div className="tab-bar">
         <button
