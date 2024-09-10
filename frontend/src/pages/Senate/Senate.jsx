@@ -3,6 +3,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Map from "../../components/Map/Map";
 import PollTable from "../../components/PollTable/PollTable";
+import SenateBar from "../../components/SenateBar/SenateBar";
 
 export const Senate = () => {
   const mergePolls = (polls) => {
@@ -221,6 +222,8 @@ export const Senate = () => {
 
   return (
     <div>
+      <br />
+      <SenateBar stateAverages={stateAverage}/>
       <Map stateColors={stateColors} stateAverages={stateAverage}/>
       <div className="toggle-container">
         <label className="switch">
