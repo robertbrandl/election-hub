@@ -56,75 +56,102 @@ export const Senate = () => {
   const calculatePollAverages = (polls) => {
     const stateAverages = {};
     const mostRecentCandidates = {};
+    const additionalCandidatesSet = {};
   
-    // Step 1: Identify the most recent poll and DEM/REP candidates for each state
     polls.forEach((poll) => {
       const state = poll.state;
+      const seatNumber = poll.seat_number; // Get the seat number
   
-      if (!mostRecentCandidates[state] || new Date(poll.end_date) > new Date(mostRecentCandidates[state].end_date)) {
-        mostRecentCandidates[state] = {
+      // Use state and seat_number as key for Nebraska, but just state for others
+      const stateKey = state === "Nebraska" ? `${state}-${seatNumber}` : state;
+  
+      // Initialize or update most recent candidates based on stateKey
+      if (
+        !mostRecentCandidates[stateKey] ||
+        (new Date(poll.end_date) > new Date(mostRecentCandidates[stateKey].end_date) && poll.candidates.length > 2)
+      ) {
+        mostRecentCandidates[stateKey] = {
           poll,
           demCandidate: null,
           repCandidate: null,
+          additionalCandidates: {},
         };
   
-        // Identify DEM and REP candidates in the most recent poll
         poll.candidates.forEach((candidate) => {
           if (candidate.party === "DEM") {
-            mostRecentCandidates[state].demCandidate = candidate.name;
+            mostRecentCandidates[stateKey].demCandidate = candidate.name;
           } else if (candidate.party === "REP") {
-            mostRecentCandidates[state].repCandidate = candidate.name;
-          } else if (state == "Vermont" && candidate.party === "IND"){
-            mostRecentCandidates[state].demCandidate = candidate.name;
-          } else if (state === "Nebraska" && (candidate.party === "IND" || candidate.party === "DEM")){
-            mostRecentCandidates[state].demCandidate = candidate.name;
+            mostRecentCandidates[stateKey].repCandidate = candidate.name;
+          } else if (state === "Vermont" && candidate.party === "IND") {
+            mostRecentCandidates[stateKey].demCandidate = candidate.name;
+          } else if (state === "Nebraska" && (candidate.party === "IND" || candidate.party === "DEM")) {
+            mostRecentCandidates[stateKey].demCandidate = candidate.name;
+          } else {
+            mostRecentCandidates[stateKey].additionalCandidates[candidate.party] = candidate.name;
           }
         });
+  
+        additionalCandidatesSet[stateKey] = mostRecentCandidates[stateKey].additionalCandidates;
       }
     });
   
-    // Step 2: Calculate averages using only polls that contain the identified DEM/REP candidates
+    // Step 2: Calculate averages using only polls that contain the identified DEM/REP and other candidates
     polls.forEach((poll) => {
       const state = poll.state;
-      const { demCandidate, repCandidate } = mostRecentCandidates[state];
+      const seatNumber = poll.seat_number; // Get the seat number
+      const stateKey = state === "Nebraska" ? `${state}-${seatNumber}` : state;
   
-      // Check if the poll contains the identified DEM and REP candidates
-      const hasDemCandidate = poll.candidates.some(candidate => candidate.name === demCandidate);
-      const hasRepCandidate = poll.candidates.some(candidate => candidate.name === repCandidate);
+      const { demCandidate, repCandidate, additionalCandidates } = mostRecentCandidates[stateKey] || {};
   
-      if (hasDemCandidate && hasRepCandidate) {
-        if (!stateAverages[state]) {
-          stateAverages[state] = {};
+      if (demCandidate && repCandidate) {
+        const hasDemCandidate = poll.candidates.some((candidate) => candidate.name === demCandidate);
+        const hasRepCandidate = poll.candidates.some((candidate) => candidate.name === repCandidate);
+  
+        let hasAllAdditionalCandidates = true;
+        if (additionalCandidatesSet[stateKey] && poll.candidates.length > 2) {
+          Object.keys(additionalCandidatesSet[stateKey]).forEach((party) => {
+            const expectedCandidate = additionalCandidatesSet[stateKey][party];
+            const hasCandidate = poll.candidates.some((candidate) => candidate.name === expectedCandidate);
+            if (!hasCandidate) {
+              hasAllAdditionalCandidates = false;
+            }
+          });
         }
   
-        poll.candidates.forEach((candidate) => {
-          const { name, pct, party } = candidate;
-  
-          if (!stateAverages[state][name]) {
-            stateAverages[state][name] = {
-              total: 0,
-              count: 0,
-              party: party,
-            };
+        if (hasDemCandidate && hasRepCandidate && hasAllAdditionalCandidates) {
+          if (!stateAverages[stateKey]) {
+            stateAverages[stateKey] = {};
           }
   
-          stateAverages[state][name].total += pct;
-          stateAverages[state][name].count += 1;
-        });
+          poll.candidates.forEach((candidate) => {
+            const { name, pct, party } = candidate;
+  
+            if (!stateAverages[stateKey][name]) {
+              stateAverages[stateKey][name] = {
+                total: 0,
+                count: 0,
+                party: party,
+              };
+            }
+  
+            stateAverages[stateKey][name].total += pct;
+            stateAverages[stateKey][name].count += 1;
+          });
+        }
       }
     });
   
-    // Step 3: Calculate the average for each candidate in each state
-    Object.keys(stateAverages).forEach((state) => {
-      Object.keys(stateAverages[state]).forEach((candidate) => {
-        stateAverages[state][candidate].average =
-          stateAverages[state][candidate].total /
-          stateAverages[state][candidate].count;
+    Object.keys(stateAverages).forEach((stateKey) => {
+      Object.keys(stateAverages[stateKey]).forEach((candidate) => {
+        stateAverages[stateKey][candidate].average =
+          stateAverages[stateKey][candidate].total / stateAverages[stateKey][candidate].count;
       });
     });
   
     return stateAverages;
   };
+  
+  
   
   
 
@@ -149,11 +176,23 @@ export const Senate = () => {
 
       // Assign color based on the leading candidate (simplified example)
       if (leadingParty === "REP") {
-        stateColors[state] = "#FF6347"; // Red
+        
+        console.log(state)
+        if (state !== "Nebraska-0" && state !== "Nebraska-2"){
+          stateColors[state] = "#FF6347"; // Red
+        }
+        else if (state === "Nebraska-0"){
+          stateColors["Nebraska"] = "#FF6347"; // Red
+        }
       } else if (leadingParty === "DEM") {
         stateColors[state] = "#4682B4"; // Blue
       } else {
-        stateColors[state] = "#32CD32"; // Green or other
+        if (state !== "Nebraska0" && state !== "Nebraska2"){
+          stateColors[state] = "#32CD32"; // Green or other
+        }
+        else if (state === "Nebraska-0"){
+          stateColors["Nebraska"] =  "#32CD32"; // Green or other
+        }
       }
     });
 

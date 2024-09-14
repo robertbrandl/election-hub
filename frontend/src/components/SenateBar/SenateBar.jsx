@@ -11,6 +11,7 @@ const SenateBar = ({ stateAverages }) => {
     let highestAverage = 0;
 
     Object.keys(stateResult).forEach((candidate) => {
+        console.log(stateResult)
       const avg = stateResult[candidate].average;
       if (avg > highestAverage) {
         highestAverage = avg;
