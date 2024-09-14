@@ -5,6 +5,7 @@ import Map from "../../components/Map/Map";
 import PollTable from "../../components/PollTable/PollTable";
 
 export const House = () => {
+  let high_quality_score = 2;//change as needed
   const mergePolls = (polls) => {
     const mergedPolls = [];
 
@@ -197,7 +198,7 @@ export const House = () => {
     }
 
     if (isHighQuality) {
-      filtered = filtered.filter((poll) => poll.numeric_grade > 2);
+      filtered = filtered.filter((poll) => poll.numeric_grade > high_quality_score);
     }
 
     if (selectedState) {

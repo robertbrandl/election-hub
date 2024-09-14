@@ -6,6 +6,7 @@ import PollTable from "../../components/PollTable/PollTable";
 import SenateBar from "../../components/SenateBar/SenateBar";
 
 export const Senate = () => {
+  let high_quality_score = 2;//change as needed
   const mergePolls = (polls) => {
     const mergedPolls = [];
 
@@ -265,7 +266,7 @@ export const Senate = () => {
     }
 
     if (isHighQuality) {
-      filtered = filtered.filter((poll) => poll.numeric_grade > 2);
+      filtered = filtered.filter((poll) => poll.numeric_grade > high_quality_score);
     }
 
     if (selectedState) {
