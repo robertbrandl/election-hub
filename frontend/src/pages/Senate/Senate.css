@@ -1,0 +1,46 @@
+.senate-legend {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    width: 200px;
+    height: 260px;
+    margin: 1rem;
+    text-align: center;
+    align-items: center;
+    flex-basis: 200px; /* Legend will have a fixed width */
+  }
+  
+  .senate-legend h4 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .color-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+  }
+  
+  .legend-item span {
+    font-size: 0.9rem;
+  }
+  .map-legend-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px; /* Adjust the max width as needed */
+    align-items: center;
+  }
+  
+  .map-legend-container .map {
+    flex: 1; /* Map will take most of the available space */
+    margin-right: 20px;
+  }  

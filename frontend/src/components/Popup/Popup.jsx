@@ -2,7 +2,6 @@ import React from "react";
 import "./Popup.css";
 
 const Popup = ({ stateName, races, onClose }) => {
-  console.log(races);
   return (
     <div className="popup">
       <div className="popup-content">
@@ -26,6 +25,8 @@ const Popup = ({ stateName, races, onClose }) => {
                   </div>
                 ))}
             </div>
+            {(stateName == "Hawaii" || stateName == "Delaware" || stateName == "Mississippi" || stateName == "Wyoming" || stateName == "Connecticut" || stateName == "Rhode Island" ) && <br />}
+            {(stateName == "Hawaii" || stateName == "Delaware" || stateName == "Mississippi" || stateName == "Wyoming" || stateName == "Connecticut" || stateName == "Rhode Island" ) &&<h4>***No Polls Conducted. Percentages based on 2018 Senate Election Results.</h4>}
           </div>
         ))}
       </div>

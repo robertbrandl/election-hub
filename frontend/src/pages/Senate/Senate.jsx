@@ -61,6 +61,10 @@ export const Senate = () => {
   
     polls.forEach((poll) => {
       const state = poll.state;
+      const hasBobMenendez = poll.candidates.some(candidate => candidate.name === "Bob Menendez");
+      if (state === "New Jersey" && hasBobMenendez) {
+        return; // Skip this poll
+      }
       const seatNumber = poll.seat_number; // Get the seat number
   
       // Use state and seat_number as key for Nebraska, but just state for others
@@ -99,6 +103,10 @@ export const Senate = () => {
     // Step 2: Calculate averages using only polls that contain the identified DEM/REP and other candidates
     polls.forEach((poll) => {
       const state = poll.state;
+      const hasBobMenendez = poll.candidates.some(candidate => candidate.name === "Bob Menendez");
+      if (state === "New Jersey" && hasBobMenendez) {
+        return; // Skip this poll
+      }
       const seatNumber = poll.seat_number; // Get the seat number
       const stateKey = state === "Nebraska" ? `${state}-${seatNumber}` : state;
   
@@ -148,7 +156,43 @@ export const Senate = () => {
           stateAverages[stateKey][candidate].total / stateAverages[stateKey][candidate].count;
       });
     });
-  
+    console.log(stateAverages)
+    //handling states with no polls
+    const customCandidates = {
+      "Hawaii": {
+        "Mazie Hirono": { total: 60, count: 1, party: "DEM", average: 71.15 },
+        "Bob McDermott": { total: 40, count: 1, party: "REP", average: 28.85 },
+      },
+      "Delaware": {
+        "Lisa Blunt Rochester": { total: 55, count: 1, party: "DEM", average: 59.95 },
+        "Eric Hansen": { total: 45, count: 1, party: "REP", average: 37.81 },
+      },
+      "Connecticut": {
+        "Chris Murphy": { total: 55, count: 1, party: "DEM", average: 59.53 },
+        "Matthew Corey": { total: 45, count: 1, party: "REP", average: 39.35 },
+      },
+      "Rhode Island": {
+        "Sheldon Whitehouse": { total: 55, count: 1, party: "DEM", average: 61.44 },
+        "Patricia Morgan": { total: 45, count: 1, party: "REP", average: 38.33 },
+      },
+      "Wyoming": {
+        "Scott Morrow": { total: 55, count: 1, party: "DEM", average: 30.10 },
+        "John Barrasso": { total: 45, count: 1, party: "REP", average: 66.96 },
+      },
+      "Mississippi": {
+        "Ty Pinkins": { total: 55, count: 1, party: "DEM", average: 39.47 },
+        "Roger Wicker": { total: 45, count: 1, party: "REP", average: 58.49 },
+      },
+    };
+
+    const statesWithNoPolls = ["Hawaii", "Delaware", "Rhode Island", "Connecticut", "Wyoming", "Mississippi"];
+
+    statesWithNoPolls.forEach((state) => {
+      if (!stateAverages[state] && customCandidates[state]) {
+        stateAverages[state] = customCandidates[state];
+      }
+    });
+    
     return stateAverages;
   };
   
@@ -158,47 +202,75 @@ export const Senate = () => {
 
   const determineLeadingCandidate = (stateAverages) => {
     const stateColors = {};
-    console.log(stateAverages)
-
+  
     Object.keys(stateAverages).forEach((state) => {
       let leadingCandidate = null;
-      let leadingParty = null;
+      let secondCandidate = null;
       let highestAverage = 0;
-
+      let secondHighestAverage = 0;
+  
+      // Find leading and second candidate
       Object.keys(stateAverages[state]).forEach((candidate) => {
         const avg = stateAverages[state][candidate].average;
         if (avg > highestAverage) {
+          secondHighestAverage = highestAverage;
+          secondCandidate = leadingCandidate;
           highestAverage = avg;
           leadingCandidate = candidate;
-          leadingParty = stateAverages[state][leadingCandidate].party;
+        } else if (avg > secondHighestAverage) {
+          secondHighestAverage = avg;
+          secondCandidate = candidate;
         }
       });
-      console.log(leadingCandidate)
-
-      // Assign color based on the leading candidate (simplified example)
+  
+      const leadingParty = stateAverages[state][leadingCandidate].party;
+      const margin = highestAverage - secondHighestAverage;
+  
+      // Determine shading based on margin
+      let color = "";
       if (leadingParty === "REP") {
-        
-        console.log(state)
-        if (state !== "Nebraska-0" && state !== "Nebraska-2"){
-          stateColors[state] = "#FF6347"; // Red
-        }
-        else if (state === "Nebraska-0"){
-          stateColors["Nebraska"] = "#FF6347"; // Red
+        if (margin <= 2) {
+          color = "#FFCCCB"; // Very light red
+        } else if (margin <= 5) {
+          color = "#FF7F7F"; // Lighter red
+        } else if (margin <= 10) {
+          color = "#FF6347"; // Medium red
+        } else {
+          color = "#FF0000"; // Dark red
         }
       } else if (leadingParty === "DEM") {
-        stateColors[state] = "#4682B4"; // Blue
-      } else {
-        if (state !== "Nebraska0" && state !== "Nebraska2"){
-          stateColors[state] = "#32CD32"; // Green or other
+        if (margin <= 2) {
+          color = "#ADD8E6"; // Very light blue
+        } else if (margin <= 5) {
+          color = "#6CA6CD"; // Lighter blue
+        } else if (margin <= 10) {
+          color = "#4682B4"; // Medium blue
+        } else {
+          color = "#00008B"; // Dark blue
         }
-        else if (state === "Nebraska-0"){
-          stateColors["Nebraska"] =  "#32CD32"; // Green or other
+      } else {
+        if (margin <= 2) {
+          color = "#98FB98"; // Very light green
+        } else if (margin <= 5) {
+          color = "#32CD32"; // Lighter green
+        } else if (margin <= 10) {
+          color = "#228B22"; // Medium green
+        } else {
+          color = "#006400"; // Dark green
         }
       }
+  
+      // Handle Nebraska seat logic with adjusted colors
+      if (state !== "Nebraska-0" && state !== "Nebraska-2") {
+        stateColors[state] = color;
+      } else if (state === "Nebraska-0") {
+        stateColors["Nebraska"] = color;
+      }
     });
-
+  
     return stateColors;
   };
+  
 
   const [pollData, setPollData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -296,12 +368,54 @@ export const Senate = () => {
   } else if (error) {
     return <div className="error-gen">Error: {error}</div>;
   }
+  const SenateLegend = () => {
+    return (
+      <div className="senate-legend">
+        <h4>Margin Breakdown</h4>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#FFCCCB" }}></div>
+          <span>Tilt R (0-2%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#FF7F7F" }}></div>
+          <span>Lean R (2-5%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#FF6347" }}></div>
+          <span>Likely R (5-10%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#FF0000" }}></div>
+          <span>Safe R (&gt;10%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#ADD8E6" }}></div>
+          <span>Tilt D (0-2%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#6CA6CD" }}></div>
+          <span>Lean D (2-5%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#4682B4" }}></div>
+          <span>Likely D (5-10%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#00008B" }}></div>
+          <span>Safe D (&gt;10%)</span>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div>
       <br />
       <SenateBar stateAverages={stateAverage}/>
-      <Map stateColors={stateColors} stateAverages={stateAverage}/>
+      <div className="map-legend-container">
+        <Map stateColors={stateColors} stateAverages={stateAverage}/>
+        <SenateLegend />
+      </div>
       <div className="toggle-container">
         <label className="switch">
           <input
