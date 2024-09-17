@@ -59,6 +59,7 @@ export const Senate = () => {
     const mostRecentCandidates = {};
     const additionalCandidatesSet = {};
   
+    // Step 1: Find the most recent candidates for each state
     polls.forEach((poll) => {
       const state = poll.state;
       const hasBobMenendez = poll.candidates.some(candidate => candidate.name === "Bob Menendez");
@@ -100,64 +101,115 @@ export const Senate = () => {
       }
     });
   
-    // Step 2: Calculate averages using only polls that contain the identified DEM/REP and other candidates
-    polls.forEach((poll) => {
-      const state = poll.state;
-      const hasBobMenendez = poll.candidates.some(candidate => candidate.name === "Bob Menendez");
-      if (state === "New Jersey" && hasBobMenendez) {
-        return; // Skip this poll
-      }
-      const seatNumber = poll.seat_number; // Get the seat number
-      const stateKey = state === "Nebraska" ? `${state}-${seatNumber}` : state;
-  
-      const { demCandidate, repCandidate, additionalCandidates } = mostRecentCandidates[stateKey] || {};
-  
-      if (demCandidate && repCandidate) {
-        const hasDemCandidate = poll.candidates.some((candidate) => candidate.name === demCandidate);
-        const hasRepCandidate = poll.candidates.some((candidate) => candidate.name === repCandidate);
-  
-        let hasAllAdditionalCandidates = true;
-        if (additionalCandidatesSet[stateKey] && poll.candidates.length > 2) {
-          Object.keys(additionalCandidatesSet[stateKey]).forEach((party) => {
-            const expectedCandidate = additionalCandidatesSet[stateKey][party];
-            const hasCandidate = poll.candidates.some((candidate) => candidate.name === expectedCandidate);
-            if (!hasCandidate) {
-              hasAllAdditionalCandidates = false;
-            }
-          });
+    // Step 2: Calculate averages using high-quality polls, fallback to all polls if no high-quality polls exist
+    const calculateAveragesForPolls = (pollsToUse, stateKey) => {
+      pollsToUse.forEach((poll) => {
+        const hasBobMenendez = poll.candidates.some(candidate => candidate.name === "Bob Menendez");
+        if (poll.state === "New Jersey" && hasBobMenendez) {
+          return; // Skip this poll
         }
+        const { demCandidate, repCandidate, additionalCandidates } = mostRecentCandidates[stateKey] || {};
   
-        if (hasDemCandidate && hasRepCandidate && hasAllAdditionalCandidates) {
-          if (!stateAverages[stateKey]) {
-            stateAverages[stateKey] = {};
+        if (demCandidate && repCandidate) {
+          const hasDemCandidate = poll.candidates.some((candidate) => candidate.name === demCandidate);
+          const hasRepCandidate = poll.candidates.some((candidate) => candidate.name === repCandidate);
+  
+          let hasAllAdditionalCandidates = true;
+          if (additionalCandidatesSet[stateKey] && poll.candidates.length > 2) {
+            Object.keys(additionalCandidatesSet[stateKey]).forEach((party) => {
+              const expectedCandidate = additionalCandidatesSet[stateKey][party];
+              const hasCandidate = poll.candidates.some((candidate) => candidate.name === expectedCandidate);
+              if (!hasCandidate) {
+                hasAllAdditionalCandidates = false;
+              }
+            });
           }
   
-          poll.candidates.forEach((candidate) => {
-            const { name, pct, party } = candidate;
-  
-            if (!stateAverages[stateKey][name]) {
-              stateAverages[stateKey][name] = {
-                total: 0,
-                count: 0,
-                party: party,
-              };
+          // Only process if DEM, REP, and all additional candidates are found
+          if (hasDemCandidate && hasRepCandidate && hasAllAdditionalCandidates) {
+            if (!stateAverages[stateKey]) {
+              stateAverages[stateKey] = {};
             }
   
-            stateAverages[stateKey][name].total += pct;
-            stateAverages[stateKey][name].count += 1;
+            poll.candidates.forEach((candidate) => {
+              const { name, pct, party } = candidate;
+  
+              if (!stateAverages[stateKey][name]) {
+                stateAverages[stateKey][name] = {
+                  total: 0,
+                  count: 0,
+                  party: party,
+                };
+              }
+  
+              stateAverages[stateKey][name].total += pct;
+              stateAverages[stateKey][name].count += 1;
+            });
+          }
+        }
+      });
+    };
+  
+    const statesChecked = new Set();
+  
+    // Ensure fallback to all polls if no high-quality polls exist or if high-quality polls don't have correct candidates
+    polls.forEach((poll) => {
+      const state = poll.state;
+      const seatNumber = poll.seat_number;
+      const stateKey = state === "Nebraska" ? `${state}-${seatNumber}` : state;
+  
+      // Skip if we've already processed this stateKey
+      if (statesChecked.has(stateKey)) {
+        return;
+      }
+  
+      // Separate high-quality and all polls
+      const highQualityPolls = polls.filter(p => p.state === state && (!seatNumber || p.seat_number === seatNumber) && p.numeric_grade > high_quality_score);
+      const allPolls = polls.filter(p => p.state === state && (!seatNumber || p.seat_number === seatNumber));
+  
+      let usedPolls = [];
+      let fallbackToAllPolls = false;
+  
+      // If averageQuality is true, first try high-quality polls
+      if (averageQuality) {
+        if (highQualityPolls.length > 0) {
+          const correctCandidatesInHighQuality = highQualityPolls.some(poll => {
+            const { demCandidate, repCandidate } = mostRecentCandidates[stateKey] || {};
+            return poll.candidates.some((candidate) => candidate.name === demCandidate) &&
+                   poll.candidates.some((candidate) => candidate.name === repCandidate);
           });
+  
+          // If high-quality polls do not have correct candidates, fallback to all polls
+          if (correctCandidatesInHighQuality) {
+            usedPolls = highQualityPolls;
+          } else {
+            fallbackToAllPolls = true;
+          }
+        } else {
+          fallbackToAllPolls = true; // No high-quality polls, fallback to all
         }
       }
+  
+      if (!averageQuality || fallbackToAllPolls) {
+        // If not using high-quality or falling back to all polls
+        usedPolls = allPolls;
+      }
+  
+      // Calculate averages for the selected polls
+      calculateAveragesForPolls(usedPolls, stateKey);
+  
+      statesChecked.add(stateKey);
     });
   
+    // Step 3: Calculate final averages for each candidate
     Object.keys(stateAverages).forEach((stateKey) => {
       Object.keys(stateAverages[stateKey]).forEach((candidate) => {
         stateAverages[stateKey][candidate].average =
           stateAverages[stateKey][candidate].total / stateAverages[stateKey][candidate].count;
       });
     });
-    console.log(stateAverages)
-    //handling states with no polls
+  
+    // Handle states with no polls
     const customCandidates = {
       "Hawaii": {
         "Mazie Hirono": { total: 60, count: 1, party: "DEM", average: 71.15 },
@@ -184,17 +236,19 @@ export const Senate = () => {
         "Roger Wicker": { total: 45, count: 1, party: "REP", average: 58.49 },
       },
     };
-
+  
     const statesWithNoPolls = ["Hawaii", "Delaware", "Rhode Island", "Connecticut", "Wyoming", "Mississippi"];
-
+  
     statesWithNoPolls.forEach((state) => {
       if (!stateAverages[state] && customCandidates[state]) {
         stateAverages[state] = customCandidates[state];
       }
     });
-    
+  
     return stateAverages;
   };
+  
+  
   
   
   
@@ -278,6 +332,7 @@ export const Senate = () => {
   const [selectedState, setSelectedState] = useState("");
   const [isHeadToHead, setIsHeadToHead] = useState(true);
   const [isHighQuality, setIsHighQuality] = useState(true);
+  const [averageQuality, setAverageQuality] = useState(false);
   const [filteredPolls, setFilteredPolls] = useState([]);
   const [stateColors, setStateColors] = useState({});
   const [stateAverage, setStateAverage] = useState(null);
@@ -323,6 +378,25 @@ export const Senate = () => {
     }
     fetchPolls();
   }, []);
+  useEffect(() => {
+    setError("");
+    async function fetchPolls() {
+      setLoading(true);
+      try {
+
+        const stateAverages = calculatePollAverages(pollData);
+        setStateAverage(stateAverages)
+        const updatedStateColors = determineLeadingCandidate(stateAverages);
+
+        setStateColors(updatedStateColors);
+      } catch (e) {
+        console.log(e);
+        setError(e.response || e.message);
+      }
+      setLoading(false);
+    }
+    fetchPolls();
+  }, [averageQuality]);
 
   const updateFilteredPolls = (polls) => {
     let filtered = polls;
@@ -414,6 +488,17 @@ export const Senate = () => {
       <SenateBar stateAverages={stateAverage}/>
       <div className="map-legend-container">
         <Map stateColors={stateColors} stateAverages={stateAverage}/>
+        <div className="toggle-container">
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={averageQuality}
+              onChange={() => setAverageQuality(!averageQuality)}
+            />
+            <span className="slider round"></span>
+          </label>
+          <span>{averageQuality ? "High Quality: ON" : "High Quality: OFF"}</span>
+        </div>
         <SenateLegend />
       </div>
       <div className="toggle-container">
@@ -436,7 +521,7 @@ export const Senate = () => {
           />
           <span className="slider round"></span>
         </label>
-        <span>{isHighQuality ? "High Quality" : "All"}</span>
+        <span>{isHighQuality ? "High Quality: ON" : "High Quality: OFF"}</span>
       </div>
       <select
         value={selectedState}
