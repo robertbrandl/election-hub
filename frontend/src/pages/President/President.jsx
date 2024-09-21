@@ -231,11 +231,53 @@ export const President = () => {
   } else if (error) {
     return <div className="error-gen">Error: {error}</div>;
   }
+  const PresLegend = () => {
+    return (
+      <div className="senate-legend">
+        <h4>Margin Breakdown</h4>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#FFCCCB" }}></div>
+          <span>Tilt R (0-2%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#FF7F7F" }}></div>
+          <span>Lean R (2-5%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#FF6347" }}></div>
+          <span>Likely R (5-10%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#FF0000" }}></div>
+          <span>Safe R (&gt;10%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#ADD8E6" }}></div>
+          <span>Tilt D (0-2%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#6CA6CD" }}></div>
+          <span>Lean D (2-5%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#4682B4" }}></div>
+          <span>Likely D (5-10%)</span>
+        </div>
+        <div className="legend-item">
+          <div className="color-box" style={{ backgroundColor: "#00008B" }}></div>
+          <span>Safe D (&gt;10%)</span>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div>
       <EVBar stateAverages={stateAverage} />
-      <Map stateColors={stateColors} stateAverages={stateAverage} />
+      <div className="map-legend-container">
+        <Map stateColors={stateColors} stateAverages={stateAverage} />
+        <PresLegend />
+      </div>
       <div className="tab-bar">
         <button
           onClick={() => setActiveTab("national")}

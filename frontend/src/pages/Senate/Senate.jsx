@@ -58,9 +58,18 @@ export const Senate = () => {
     const stateAverages = {};
     const mostRecentCandidates = {};
     const additionalCandidatesSet = {};
+    const daysAgo = 21;
+
+    const isWithin21Days = (end_date) => {
+      const today = new Date();
+      const pollDate = new Date(end_date);
+      const timeDifference = today - pollDate;
+      const dayDifference = timeDifference / (1000 * 60 * 60 * 24);
+      return dayDifference <= daysAgo;
+    };
   
     // Step 1: Find the most recent candidates for each state
-    polls.forEach((poll) => {
+    polls && polls.forEach((poll) => {
       const state = poll.state;
       const hasBobMenendez = poll.candidates.some(candidate => candidate.name === "Bob Menendez");
       if (state === "New Jersey" && hasBobMenendez) {
@@ -153,7 +162,7 @@ export const Senate = () => {
     const statesChecked = new Set();
   
     // Ensure fallback to all polls if no high-quality polls exist or if high-quality polls don't have correct candidates
-    polls.forEach((poll) => {
+    polls && polls.forEach((poll) => {
       const state = poll.state;
       const seatNumber = poll.seat_number;
       const stateKey = state === "Nebraska" ? `${state}-${seatNumber}` : state;
@@ -165,13 +174,29 @@ export const Senate = () => {
   
       // Separate high-quality and all polls
       const highQualityPolls = polls.filter(p => p.state === state && (!seatNumber || p.seat_number === seatNumber) && p.numeric_grade > high_quality_score);
+      const recentPolls = polls.filter(p => p.state === state && (!seatNumber || p.seat_number === seatNumber) && isWithin21Days(p.end_date));
       const allPolls = polls.filter(p => p.state === state && (!seatNumber || p.seat_number === seatNumber));
   
       let usedPolls = [];
       let fallbackToAllPolls = false;
-  
+
+      if (averageQuality && averageDate) {
+        // Try to get polls that are both high-quality and recent
+        const highQualityRecentPolls = polls.filter(p => 
+          p.state === state && 
+          (!seatNumber || p.seat_number === seatNumber) && 
+          p.numeric_grade > high_quality_score && 
+          isWithin21Days(p.end_date)
+        );
+      
+        if (highQualityRecentPolls.length > 0) {
+          usedPolls = highQualityRecentPolls;
+        } else {
+          fallbackToAllPolls = true;
+        }
+      }
       // If averageQuality is true, first try high-quality polls
-      if (averageQuality) {
+      else if (averageQuality) {
         if (highQualityPolls.length > 0) {
           const correctCandidatesInHighQuality = highQualityPolls.some(poll => {
             const { demCandidate, repCandidate } = mostRecentCandidates[stateKey] || {};
@@ -189,9 +214,16 @@ export const Senate = () => {
           fallbackToAllPolls = true; // No high-quality polls, fallback to all
         }
       }
+      else if (averageDate) {
+        if (recentPolls.length > 0) {
+          usedPolls = recentPolls;
+        } else {
+          fallbackToAllPolls = true; // No recent polls, fallback to all polls
+        }
+      }
   
-      if (!averageQuality || fallbackToAllPolls) {
-        // If not using high-quality or falling back to all polls
+      if (!averageQuality && !averageDate || fallbackToAllPolls) {
+        // If neither averageQuality nor averageDate is used, or fallback is needed
         usedPolls = allPolls;
       }
   
@@ -222,10 +254,6 @@ export const Senate = () => {
       "Connecticut": {
         "Chris Murphy": { total: 55, count: 1, party: "DEM", average: 59.53 },
         "Matthew Corey": { total: 45, count: 1, party: "REP", average: 39.35 },
-      },
-      "Rhode Island": {
-        "Sheldon Whitehouse": { total: 55, count: 1, party: "DEM", average: 61.44 },
-        "Patricia Morgan": { total: 45, count: 1, party: "REP", average: 38.33 },
       },
       "Wyoming": {
         "Scott Morrow": { total: 55, count: 1, party: "DEM", average: 30.10 },
@@ -333,6 +361,7 @@ export const Senate = () => {
   const [isHeadToHead, setIsHeadToHead] = useState(true);
   const [isHighQuality, setIsHighQuality] = useState(true);
   const [averageQuality, setAverageQuality] = useState(false);
+  const [averageDate, setAverageDate] = useState(false);
   const [filteredPolls, setFilteredPolls] = useState([]);
   const [stateColors, setStateColors] = useState({});
   const [stateAverage, setStateAverage] = useState(null);
@@ -359,6 +388,8 @@ export const Senate = () => {
             return { ...poll, population: "Registered Voters" };
           } else if (poll.population === "a") {
             return { ...poll, population: "Adults" };
+          } else if (poll.population === "v") {
+            return { ...poll, population: "Voters" };
           }
           return poll;
         });
@@ -396,7 +427,7 @@ export const Senate = () => {
       setLoading(false);
     }
     fetchPolls();
-  }, [averageQuality]);
+  }, [averageQuality, averageDate]);
 
   const updateFilteredPolls = (polls) => {
     let filtered = polls;
@@ -492,11 +523,24 @@ export const Senate = () => {
           <label className="switch">
             <input
               type="checkbox"
+              checked={averageDate}
+              onChange={() => setAverageDate(!averageDate)}
+            />
+            <span className="slider round"></span>
+          </label>
+          <br />
+          <span>{averageDate ? "Dates: Recent (Past 21 Days)" : "Dates: All"}</span>
+        </div>
+        <div className="toggle-container">
+          <label className="switch">
+            <input
+              type="checkbox"
               checked={averageQuality}
               onChange={() => setAverageQuality(!averageQuality)}
             />
             <span className="slider round"></span>
           </label>
+          <br />
           <span>{averageQuality ? "High Quality: ON" : "High Quality: OFF"}</span>
         </div>
         <SenateLegend />
@@ -521,6 +565,7 @@ export const Senate = () => {
           />
           <span className="slider round"></span>
         </label>
+
         <span>{isHighQuality ? "High Quality: ON" : "High Quality: OFF"}</span>
       </div>
       <select
