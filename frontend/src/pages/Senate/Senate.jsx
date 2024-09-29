@@ -62,6 +62,7 @@ export const Senate = () => {
 
     const isWithin21Days = (end_date) => {
       const today = new Date();
+      
       const pollDate = new Date(end_date);
       const timeDifference = today - pollDate;
       const dayDifference = timeDifference / (1000 * 60 * 60 * 24);
@@ -247,14 +248,6 @@ export const Senate = () => {
         "Mazie Hirono": { total: 60, count: 1, party: "DEM", average: 71.15 },
         "Bob McDermott": { total: 40, count: 1, party: "REP", average: 28.85 },
       },
-      "Delaware": {
-        "Lisa Blunt Rochester": { total: 55, count: 1, party: "DEM", average: 59.95 },
-        "Eric Hansen": { total: 45, count: 1, party: "REP", average: 37.81 },
-      },
-      "Connecticut": {
-        "Chris Murphy": { total: 55, count: 1, party: "DEM", average: 59.53 },
-        "Matthew Corey": { total: 45, count: 1, party: "REP", average: 39.35 },
-      },
       "Wyoming": {
         "Scott Morrow": { total: 55, count: 1, party: "DEM", average: 30.10 },
         "John Barrasso": { total: 45, count: 1, party: "REP", average: 66.96 },
@@ -265,7 +258,7 @@ export const Senate = () => {
       },
     };
   
-    const statesWithNoPolls = ["Hawaii", "Delaware", "Rhode Island", "Connecticut", "Wyoming", "Mississippi"];
+    const statesWithNoPolls = ["Hawaii", "Wyoming", "Mississippi"];
   
     statesWithNoPolls.forEach((state) => {
       if (!stateAverages[state] && customCandidates[state]) {

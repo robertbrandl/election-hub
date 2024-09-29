@@ -25,8 +25,8 @@ const Popup = ({ stateName, races, onClose }) => {
                   </div>
                 ))}
             </div>
-            {(stateName == "Hawaii" || stateName == "Delaware" || stateName == "Mississippi" || stateName == "Wyoming" || stateName == "Connecticut") && <br />}
-            {(stateName == "Hawaii" || stateName == "Delaware" || stateName == "Mississippi" || stateName == "Wyoming" || stateName == "Connecticut" ) &&<h4>***No Polls Conducted. Percentages based on 2018 Senate Election Results.</h4>}
+            {(stateName == "Hawaii"  || stateName == "Mississippi" || stateName == "Wyoming") && <br />}
+            {(stateName == "Hawaii"  || stateName == "Mississippi" || stateName == "Wyoming") &&<h4>***No Polls Conducted. Percentages based on 2018 Senate Election Results.</h4>}
           </div>
         ))}
       </div>
