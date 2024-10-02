@@ -11,8 +11,9 @@ const Map = ({ stateColors, stateAverages }) => {
 
   const handleStateClick = (stateName) => {
     if (stateName === "Nebraska") {
-      // Check for both Nebraska-0 and Nebraska-2 in stateAverages
+      // Check for both Nebraska-0 and Nebraska-2 in stateAverages if Senate
       const nebraskaRaces = [];
+      if (!stateAverages["Nebraska"]){
 
       if (stateAverages["Nebraska-0"]) {
         nebraskaRaces.push({
@@ -39,12 +40,81 @@ const Map = ({ stateColors, stateAverages }) => {
           ),
         });
       }
+      }
+      else{
+        nebraskaRaces.push({
+          seat: "Statewide",
+          candidates: Object.entries(stateAverages["Nebraska"]).map(
+            ([name, data]) => ({
+              name,
+              party: data.party,
+              average: data.average,
+            })
+          ),
+        });
+        if (stateAverages["Nebraska CD-2"]) {
+          nebraskaRaces.push({
+            seat: "District 2",
+            candidates: Object.entries(stateAverages["Nebraska CD-2"]).map(
+              ([name, data]) => ({
+                name,
+                party: data.party,
+                average: data.average,
+              })
+            ),
+          });
+        }
+      }
+      
 
       setSelectedState({
         name: stateName,
         races: nebraskaRaces,
       });
-    } else if (stateAverages[stateName]) {
+    } else if (stateName === "Maine" && stateAverages["Maine CD-1"]) {
+      const maineRaces = [];
+      maineRaces.push({
+        seat: "Statewide",
+        candidates: Object.entries(stateAverages["Maine"]).map(
+          ([name, data]) => ({
+            name,
+            party: data.party,
+            average: data.average,
+          })
+        ),
+      });
+      if (stateAverages["Maine CD-1"]) {
+        maineRaces.push({
+          seat: "District 1",
+          candidates: Object.entries(stateAverages["Maine CD-1"]).map(
+            ([name, data]) => ({
+              name,
+              party: data.party,
+              average: data.average,
+            })
+          ),
+        });
+      }
+      if (stateAverages["Maine CD-2"]) {
+        maineRaces.push({
+          seat: "District 2",
+          candidates: Object.entries(stateAverages["Maine CD-2"]).map(
+            ([name, data]) => ({
+              name,
+              party: data.party,
+              average: data.average,
+            })
+          ),
+        });
+      }
+      setSelectedState({
+        name: stateName,
+        races: maineRaces,
+      });
+      
+
+    }
+    else if (stateAverages[stateName]) {
       setSelectedState({
         name: stateName,
         races: [
