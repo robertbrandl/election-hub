@@ -17,7 +17,7 @@ const EVBar = ({ stateAverages }) => {
     "West Virginia": 4, "Wisconsin": 10, "Wyoming": 3,
   };
 
-  let totalVotes = { "Republican": 0, "Democrat": 0 };
+  let totalVotes = { "Republican": 0, "Democrat": 3 };//start at 3 for DC
   let leadingCandidates = { "Republican": "", "Democrat": "" };
 
   Object.keys(stateAverages).forEach((state) => {

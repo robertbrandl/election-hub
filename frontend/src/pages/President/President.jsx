@@ -175,6 +175,54 @@ export const President = () => {
           stateAverages[state][candidate].count;
       });
     });
+
+    // Handle states with no polls
+    const customCandidates = {
+      "Hawaii": {
+        "Kamala Harris": { total: 60, count: 1, party: "DEM", average: 63.73 },
+        "Donald Trump": { total: 40, count: 1, party: "REP", average: 34.27 },
+      },
+      "Wyoming": {
+        "Kamala Harris": { total: 60, count: 1, party: "DEM", average: 26.55 },
+        "Donald Trump": { total: 40, count: 1, party: "REP", average: 69.94 },
+      },
+      "Mississippi": {
+        "Kamala Harris": { total: 60, count: 1, party: "DEM", average: 41.06 },
+        "Donald Trump": { total: 40, count: 1, party: "REP", average: 57.60 },
+      },
+      "Alabama": {
+        "Kamala Harris": { total: 60, count: 1, party: "DEM", average: 36.57 },
+        "Donald Trump": { total: 40, count: 1, party: "REP", average: 62.03 },
+      },
+      "Louisiana": {
+        "Kamala Harris": { total: 60, count: 1, party: "DEM", average: 39.85 },
+        "Donald Trump": { total: 40, count: 1, party: "REP", average: 58.46 },
+      },
+      "Kansas": {
+        "Kamala Harris": { total: 60, count: 1, party: "DEM", average: 41.51 },
+        "Donald Trump": { total: 40, count: 1, party: "REP", average: 56.14 },
+      },
+      "South Dakota": {
+        "Kamala Harris": { total: 60, count: 1, party: "DEM", average: 35.61 },
+        "Donald Trump": { total: 40, count: 1, party: "REP", average: 61.77 },
+      },
+      "Idaho": {
+        "Kamala Harris": { total: 60, count: 1, party: "DEM", average: 33.07 },
+        "Donald Trump": { total: 40, count: 1, party: "REP", average: 63.84 },
+      },
+      "Kentucky": {
+        "Kamala Harris": { total: 60, count: 1, party: "DEM", average: 36.15 },
+        "Donald Trump": { total: 40, count: 1, party: "REP", average: 62.09 },
+      },
+    };
+  
+    const statesWithNoPolls = ["Hawaii", "Wyoming", "Mississippi", "Alabama", "Louisiana", "Kansas", "South Dakota", "Idaho", "Kentucky"];
+  
+    statesWithNoPolls.forEach((state) => {
+      if (!stateAverages[state] && customCandidates[state]) {
+        stateAverages[state] = customCandidates[state];
+      }
+    });
   
     return stateAverages;
   };
